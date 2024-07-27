@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "paths": {
+      "src": ["./src"],
+      "@components": ["./src/components"],
+      "@assets": ["./src/assets"],
+      "@routes": ["./src/routes"],
+      "@context": ["./src/context"],
+      "@libs": ["./src/libs/*"]
+    },
+    "module": "NodeNext"
+  }
+}

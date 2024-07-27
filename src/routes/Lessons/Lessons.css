@@ -1,0 +1,39 @@
+.new-lessons-container {
+    margin: 30px 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.new-lesson-navigation {
+    display: flex;
+    justify-content: space-between;
+}
+
+.new-lesson-max-width {
+    @media screen and (min-width: 575px)  {
+        padding: 0 20%;
+    }
+}
+
+.new-lesson-form-label {
+    font-size: 18px;
+    line-height: 25px;
+    margin-top: 30px;
+
+    & > i {
+        font-size: 16px;
+        color: grey;
+    }
+}
+
+.new-lessons-video-card {
+    width: 320px;
+}
+
+.manage-lessons-container {
+    margin: 30px 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}

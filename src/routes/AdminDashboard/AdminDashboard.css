@@ -1,0 +1,14 @@
+.admin-dashboard-sidebar {
+    min-height: 100vh;
+    background-color: #fff;
+}
+
+.admin-dashboard-sidebar-menu {
+    width: 100%;
+}
+
+.admin-dashboard-content {
+    @media screen and (min-width: 575px) {
+        padding: 3%;
+    }
+}
