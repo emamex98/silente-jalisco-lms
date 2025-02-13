@@ -17,7 +17,6 @@ function Header() {
       </Link>
       {currentUser && (
         <div className="user-info">
-          Sesión activa: {currentUser.email}
           <Button type="primary" onClick={signOut}>
             Cerrar Sesión
           </Button>
