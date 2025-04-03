@@ -24,6 +24,7 @@ import {
   Result,
   Divider,
 } from 'antd';
+import { LEVELS } from '@utils/constants';
 
 import './Lessons.css';
 
@@ -286,14 +287,7 @@ function NewLesson() {
                   .toLowerCase()
                   .includes(input.toLowerCase())
               }
-              options={[
-                { value: 'a1', label: 'Nivel A1' },
-                { value: 'a2', label: 'Nivel A2' },
-                { value: 'b1', label: 'Nivel B1' },
-                { value: 'b2', label: 'Nivel B2' },
-                { value: 'c1', label: 'Nivel C1' },
-                { value: 'c2', label: 'Nivel C2' },
-              ]}
+              options={LEVELS}
               value={lessonDetails.level}
               onChange={(level) => {
                 setLessonDetails((current) => ({
