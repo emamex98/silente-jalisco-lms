@@ -1,0 +1,57 @@
+.student-dashboard-title {
+  text-align: center;
+  padding: 1rem 2rem;
+  font-size: 2rem;
+}
+
+.student-dashboard-subtitle {
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.grid-menu {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.grid-menu-item {
+  width: 40%;
+  text-align: center;
+  font-size: 1.2rem;
+
+  @media screen and (max-width: 750px) {
+    width: 100%;
+  }
+}
+
+.lesson-list {
+  padding: 2rem;
+}
+
+.lesson-list-title {
+  text-align: center;
+  padding: 2rem;
+  margin: 0;
+  font-size: 2rem;
+}
+
+.lesson-list-grid {
+  display: flex;
+  justify-content: space-between;
+  /* padding: 1rem 2rem; */
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.lesson-list-grid-item {
+  width: calc(50% - 1rem);
+  text-align: center;
+  font-size: 1.2rem;
+
+  @media screen and (max-width: 750px) {
+    width: 100%;
+  }
+}

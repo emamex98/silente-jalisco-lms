@@ -5,7 +5,7 @@ import {
   listAll,
   getDownloadURL,
 } from 'firebase/storage';
-import firebase from './config';
+import { firebase } from './config';
 
 type FileObject = {
   file: File;
