@@ -61,6 +61,8 @@ function VideoPlayer({ src, controls = true, customControls, ...props }) {
         const videoProgress = (video.currentTime / video.duration) * 100;
         setProgress(videoProgress);
       });
+
+      video.setAttribute('oncontextmenu', 'return false;');
     }
   }, []);
 
