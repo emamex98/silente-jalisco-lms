@@ -1,0 +1,15 @@
+.video-container {
+  width: 100%;
+  max-width: 40rem;
+
+  & > video {
+    width: 100%;
+  }
+}
+
+.video-custom-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}

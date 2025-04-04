@@ -1,4 +1,28 @@
 .login-container {
-    margin: 10% 30%;
-    height: 60vh;
+  text-align: center;
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.login-title {
+  text-align: center;
+  font-size: 2rem;
+}
+
+.login-subtitle {
+  text-align: center;
+  font-size: 1.2rem !important;
+}
+
+.login-input {
+  width: 30rem;
+  max-width: 90%;
+}
+
+.login-error .ant-alert-message {
+  font-size: 1rem !important;
+  font-weight: bold;
 }

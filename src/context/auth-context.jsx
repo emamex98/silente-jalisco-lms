@@ -12,6 +12,12 @@ export const AuthContext = createContext({
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(undefined);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [userData, setUserData] = useState({
+    name: '',
+    role: 'student',
+    level: '',
+  });
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,6 +48,8 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     setCurrentUser,
+    userData,
+    setUserData,
     signOut,
     isAuthLoading,
   };

@@ -12,6 +12,8 @@ export default defineConfig({
       '@routes': '/src/routes',
       '@context': '/src/context',
       '@libs': '/src/libs',
+      '@utils': '/src/utils',
+      '@hooks': '/src/hooks',
     },
   },
 });

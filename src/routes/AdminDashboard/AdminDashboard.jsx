@@ -1,9 +1,9 @@
-import { useContext, useState } from 'react';
-import { AuthContext } from '@context/auth-context';
+import { useState } from 'react';
 import { Row, Col, Menu } from 'antd';
 import './AdminDashboard.css';
 
 import Lessons from './Lessons';
+import Students from './Students';
 
 const menuItems = [
   {
@@ -14,14 +14,13 @@ const menuItems = [
   //   key: 'levels',
   //   label: 'Niveles',
   // },
-  // {
-  //   key: 'students',
-  //   label: 'Estudiantes',
-  // },
+  {
+    key: 'students',
+    label: 'Estudiantes',
+  },
 ];
 
 function AdminDashboard() {
-  const { currentUser, signOut } = useContext(AuthContext);
   const [currentView, setCurrentView] = useState('lessons');
 
   const handleClick = (e) => {
@@ -42,7 +41,7 @@ function AdminDashboard() {
       <Col span={18} className="admin-dashboard-content">
         {currentView === 'lessons' && <Lessons />}
         {currentView === 'levels' && <>Niveles</>}
-        {currentView === 'students' && <>Estudiantes</>}
+        {currentView === 'students' && <Students />}
       </Col>
     </Row>
   );
