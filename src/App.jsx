@@ -7,6 +7,7 @@ import Login from '@routes/Login/Login';
 import ConfirmLogin from '@routes/Login/ConfirmLogin';
 import AdminDashboard from '@routes/AdminDashboard/AdminDashboard';
 import StudentDashboard from '@routes/StudentDashboard/StudentDashboard';
+import StudentError from '@routes/StudentDashboard/StudentError';
 import Header from '@components/Header/Header';
 import Footer from '@components/Footer/Footer';
 import NewLesson from '@routes/Lessons/NewLesson';
@@ -47,6 +48,7 @@ function App() {
     useContext(AuthContext);
 
   const isAdmin = userData.role === 'admin';
+  const isActive = userData.active;
 
   useEffect(() => {
     const fetchUserData = async (userCredential) => {
@@ -80,8 +82,11 @@ function App() {
           )}
 
           {/* Handle authenticated students */}
-          {currentUser && !isAdmin && (
+          {currentUser && !isAdmin && isActive && (
             <Route path="/*" element={<StudentRoutes />} />
+          )}
+          {currentUser && !isAdmin && !isActive && (
+            <Route path="/*" element={<StudentError />} />
           )}
 
           {/* Handle authenticated admins */}

@@ -9,6 +9,7 @@ import {
   sendSignInLinkToEmail,
   isSignInWithEmailLink,
   signInWithEmailLink,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { get } from './database.js';
 import { firebase, userCreationInstance } from './config';
@@ -67,5 +68,11 @@ export const getUserData = async (userCredential) => {
 
 export const createUser = async (email: string) => {
   const secondAuth = getAuth(userCreationInstance);
-  return await createUserWithEmailAndPassword(secondAuth, email, 'silente1');
+  const userCredential = await createUserWithEmailAndPassword(
+    secondAuth,
+    email,
+    'silente1'
+  );
+  await sendPasswordResetEmail(secondAuth, email);
+  return userCredential;
 };
