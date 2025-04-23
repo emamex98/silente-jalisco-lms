@@ -11,6 +11,7 @@ import StudentError from '@routes/StudentDashboard/StudentError';
 import Header from '@components/Header/Header';
 import Footer from '@components/Footer/Footer';
 import NewLesson from '@routes/Lessons/NewLesson';
+import NewRecordedLesson from '@routes/Lessons/NewRecordedLesson';
 import ManageLesson from '@routes/Lessons/ManageLesson';
 import LearnPracticeLesson from '@routes/Lessons/LearnPracticeLesson';
 
@@ -36,7 +37,8 @@ function AdminRoutes() {
     {
       path: 'lecciones',
       children: [
-        { path: 'nueva', element: <NewLesson /> },
+        { path: 'subir', element: <NewLesson /> },
+        { path: 'grabar', element: <NewRecordedLesson /> },
         { path: ':level/:name', element: <ManageLesson /> },
       ],
     },
@@ -52,11 +54,13 @@ function App() {
 
   useEffect(() => {
     const fetchUserData = async (userCredential) => {
-      const { displayName, role, level } = await getUserData(userCredential);
+      const { displayName, role, level, active } =
+        await getUserData(userCredential);
       setUserData({
         name: displayName ?? 'usuario',
         role: role ?? 'student',
         level: level ?? 'A1',
+        active: active ?? true,
       });
     };
 
@@ -85,7 +89,8 @@ function App() {
           {currentUser && !isAdmin && isActive && (
             <Route path="/*" element={<StudentRoutes />} />
           )}
-          {currentUser && !isAdmin && !isActive && (
+
+          {currentUser && !isAdmin && isActive === false && (
             <Route path="/*" element={<StudentError />} />
           )}
 

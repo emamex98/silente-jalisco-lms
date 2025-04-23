@@ -2,7 +2,7 @@ import { Modal, Input, Form, Select } from 'antd';
 import { LEVELS, USER_ACTIONS } from '@utils/constants';
 import { createUser } from '@libs/firebase/authentication';
 import { useEffect, useState } from 'react';
-import { get, post } from '@libs/firebase/database';
+import { get, post, remove } from '@libs/firebase/database';
 
 function EditStudentModal({
   action,
@@ -13,6 +13,7 @@ function EditStudentModal({
 }) {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [form] = Form.useForm();
+  const [userName, setUserName] = useState('');
 
   const handleCreateUser = async ({ name, email, level }) => {
     try {
@@ -57,6 +58,19 @@ function EditStudentModal({
     }
   };
 
+  const handleDeleteUser = async () => {
+    try {
+      setConfirmLoading(true);
+      await remove(`user_data/${currentData}`);
+      setOpenModal(false);
+      setSuccessCount((i) => i + 1);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
   const handleModalCancel = () => {
     setOpenModal(false);
     form.resetFields();
@@ -84,7 +98,9 @@ function EditStudentModal({
         form.setFieldsValue({
           name: response.displayName,
           level: response.level,
+          status: response.active ? 'active' : 'inactive',
         });
+        setUserName(response.displayName);
       }
     } catch (e) {
       console.error(e);
@@ -100,6 +116,22 @@ function EditStudentModal({
       ? 'Registrar un nuevo estudiante'
       : 'Editar datos de un estudiante';
 
+  if (action === USER_ACTIONS.DELETE) {
+    return (
+      <Modal
+        title="Eliminar cuenta de un estudiante"
+        open={openModal}
+        onOk={handleDeleteUser}
+        okText="Eliminar"
+        confirmLoading={confirmLoading}
+        onCancel={handleModalCancel}
+        cancelText="Cancelar"
+      >
+        Confirma que deseas borrar la cuenta de <b>{userName}</b>.
+      </Modal>
+    );
+  }
+
   return (
     <Modal
       title={title}
@@ -109,6 +141,7 @@ function EditStudentModal({
       }}
       confirmLoading={confirmLoading}
       onCancel={handleModalCancel}
+      cancelText="Cancelar"
     >
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item

@@ -13,9 +13,12 @@ type FileObject = {
 };
 
 const storage = getStorage(firebase);
+const environment = import.meta.env.VITE_FIREBASE_ENVIRONMENT
+  ? `${import.meta.env.VITE_FIREBASE_ENVIRONMENT}/`
+  : '';
 
 export const uploadFile = async (file: File, path: string) => {
-  const storageRef = ref(storage, path);
+  const storageRef = ref(storage, `${environment}${path}`);
   try {
     const snapshot = await uploadBytes(storageRef, file);
     return snapshot;
@@ -26,7 +29,7 @@ export const uploadFile = async (file: File, path: string) => {
 };
 
 export const listFiles = async (path: string) => {
-  const listRef = ref(storage, path);
+  const listRef = ref(storage, `${environment}${path}`);
   try {
     const files = await listAll(listRef);
     return files?.items;

@@ -1,9 +1,9 @@
-import { Button, Table, Flex } from 'antd';
+import { Button, Table, Flex, Tag } from 'antd';
 import { get } from '@libs/firebase/database';
 import { useEffect, useState } from 'react';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import EditStudentModal from '@components/Modal/EditStudentModal';
-import { USER_ACTIONS } from '@utils/constants';
+import { USER_ACTIONS, LEVELS } from '@utils/constants';
 
 function ActionButtons({
   userId,
@@ -23,8 +23,15 @@ function ActionButtons({
       >
         Editar
       </Button>
-      <Button icon={<DeleteOutlined />} disabled>
-        Borrar
+      <Button
+        icon={<DeleteOutlined />}
+        onClick={() => {
+          setCurrentData(userId);
+          setUserAction(USER_ACTIONS.DELETE);
+          setOpenModal(true);
+        }}
+      >
+        Eliminar
       </Button>
     </Flex>
   );
@@ -44,12 +51,25 @@ function Students() {
       title: 'Nombre',
       dataIndex: 'displayName',
       key: 'displayName',
-      width: '300px',
+      width: '270px',
+      sorter: (a, b) => a.displayName.localeCompare(b.displayName),
     },
     {
       title: 'Nivel',
       dataIndex: 'level',
       key: 'level',
+      filterMode: 'menu',
+      filters: Object.keys(LEVELS).map((key) => ({
+        text: LEVELS[key].label,
+        value: LEVELS[key].value.toUpperCase(),
+      })),
+      onFilter: (value, record) => record.level === value,
+      filterMultiple: true,
+    },
+    {
+      title: 'Estatus',
+      dataIndex: 'status',
+      key: 'status',
     },
     {
       title: 'Acciones',
@@ -81,6 +101,11 @@ function Students() {
               ),
               ...user,
               level: user.level.toUpperCase(),
+              status: user.active ? (
+                <Tag color="success">Activo</Tag>
+              ) : (
+                <Tag color="error">Inactivo</Tag>
+              ),
             });
           }
         });
