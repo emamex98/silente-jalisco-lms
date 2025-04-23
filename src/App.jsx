@@ -89,7 +89,6 @@ function App() {
           {currentUser && !isAdmin && isActive && (
             <Route path="/*" element={<StudentRoutes />} />
           )}
-
           {currentUser && !isAdmin && isActive === false && (
             <Route path="/*" element={<StudentError />} />
           )}
