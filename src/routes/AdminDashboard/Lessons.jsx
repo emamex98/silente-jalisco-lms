@@ -1,4 +1,4 @@
-import { Button, Table, Flex } from 'antd';
+import { Button, Table, Flex, Dropdown } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { get } from '@libs/firebase/database';
 import { useEffect, useState } from 'react';
@@ -88,19 +88,33 @@ function Lessons() {
     fetchLessons();
   }, []);
 
+  const items = [
+    {
+      label: 'Subir videos existentes',
+      key: '1',
+      onClick: () => {
+        navigate('/lecciones/subir');
+      },
+    },
+    {
+      label: 'Grabar videos nuevos',
+      key: '2',
+      onClick: () => {
+        navigate('/lecciones/grabar');
+      },
+    },
+  ];
+
   return (
     <>
       <Flex justify="space-between" align="center">
         <h2>Lecciones</h2>
-        <Button
-          type="primary"
-          onClick={() => {
-            navigate('/lecciones/nueva');
-          }}
-          icon={<PlusOutlined />}
-        >
-          Nueva Lección
-        </Button>
+
+        <Dropdown menu={{ items }} trigger="click">
+          <Button type="primary" icon={<PlusOutlined />}>
+            Nueva Lección
+          </Button>
+        </Dropdown>
       </Flex>
       <Table columns={columns} dataSource={data} loading={isLoading} />
     </>

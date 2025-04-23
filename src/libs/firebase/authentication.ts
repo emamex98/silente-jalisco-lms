@@ -59,7 +59,7 @@ export const userStateListener = (callback: NextOrObserver<User>) => {
   return onAuthStateChanged(auth, callback);
 };
 
-export const SignOutUser = async () => await signOut(auth);
+export const signOutUser = async () => await signOut(auth);
 
 export const getUserData = async (userCredential) => {
   const { uid } = userCredential;

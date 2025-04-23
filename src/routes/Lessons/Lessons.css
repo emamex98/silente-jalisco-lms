@@ -105,3 +105,15 @@
   padding: 1rem;
   gap: 0.6rem;
 }
+
+.new-lesson-record-action-card {
+  width: 318px;
+  height: 310.141px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.new-lesson-record-action-card-content {
+  text-align: center;
+}

@@ -17,8 +17,10 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-error-boundary": "^4.0.13",
+    "react-media-recorder": "^1.7.1",
     "react-promise-suspense": "^0.3.4",
     "react-router-dom": "^6.24.1",
+    "react-video-recorder": "^3.19.4",
     "styled-components": "^6.1.11",
     "uuid": "^10.0.0"
   },

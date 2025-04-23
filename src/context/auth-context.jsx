@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { SignOutUser, userStateListener } from '@libs/firebase/authentication';
+import { signOutUser, userStateListener } from '@libs/firebase/authentication';
 import { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext({
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   // As soon as setting the current user to null,
   // the user will be redirected to the home page.
   const signOut = () => {
-    SignOutUser();
+    signOutUser();
     setCurrentUser(null);
     navigate('/');
   };
