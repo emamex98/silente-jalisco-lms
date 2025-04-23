@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
+    "@sentry/react": "^9.13.0",
+    "@sentry/vite-plugin": "^3.3.1",
     "antd": "^5.19.2",
     "firebase": "^10.12.2",
     "prettier": "^3.3.2",
