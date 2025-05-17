@@ -222,6 +222,7 @@ function NewRecordedLesson() {
 
       await post(`${pathName}/styledName`, lessonDetails.name);
       await post(`${pathName}/styledLevel`, lessonDetails.level.toUpperCase());
+      await post(`${pathName}/isVisible`, true);
 
       setShowConfirmationModal(true);
     } catch (e) {

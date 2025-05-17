@@ -1,16 +1,40 @@
-import { Button, Table, Flex, Dropdown } from 'antd';
+import { Button, Table, Flex, Dropdown, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { get } from '@libs/firebase/database';
+import { get, post, remove } from '@libs/firebase/database';
+import { deleteFolder } from '@libs/firebase/storage';
 import { useEffect, useState } from 'react';
 import {
   ExportOutlined,
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
 } from '@ant-design/icons';
 
-function ActionButtons({ path }) {
+function ActionButtons({ path, isVisible, refresher }) {
   const navigate = useNavigate();
+
+  const deleteLesson = async (path) => {
+    try {
+      await remove(path.replace('/lecciones/', '/lessons/'));
+      await deleteFolder(path.replace('/lecciones', ''));
+      refresher((i) => i + 1);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const toggleLessonVisbility = async (path) => {
+    try {
+      const lessonVisibilityPath = `${path.replace('/lecciones/', '/lessons/')}/isVisible`;
+      const resp = await post(lessonVisibilityPath, !isVisible);
+      refresher((i) => i + 1);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <Flex gap={10}>
       <Button
@@ -21,10 +45,23 @@ function ActionButtons({ path }) {
       >
         Abrir
       </Button>
-      <Button icon={<EditOutlined />} disabled>
+      {/* <Button icon={<EditOutlined />} disabled>
         Editar
+      </Button> */}
+      <Button
+        icon={isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+        onClick={() => {
+          toggleLessonVisbility(path);
+        }}
+      >
+        {isVisible ? 'Ocultar' : 'Mostrar'}
       </Button>
-      <Button icon={<DeleteOutlined />} disabled>
+      <Button
+        icon={<DeleteOutlined />}
+        onClick={() => {
+          deleteLesson(path);
+        }}
+      >
         Borrar
       </Button>
     </Flex>
@@ -35,6 +72,7 @@ function Lessons() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [refreshCount, setRefreshCount] = useState(0);
 
   const columns = [
     {
@@ -47,6 +85,11 @@ function Lessons() {
       title: 'Nivel',
       dataIndex: 'level',
       key: 'level',
+    },
+    {
+      title: 'Visibilidad',
+      dataIndex: 'isVisible',
+      key: 'isVisible',
     },
     {
       title: 'Acciones',
@@ -68,8 +111,17 @@ function Lessons() {
             name: response[levelKey][lessonKey].styledName,
             level: response[levelKey][lessonKey].styledLevel,
             key: `${levelKey}-${lessonKey}`,
+            isVisible: response[levelKey][lessonKey].isVisible ? (
+              <Tag color="success">Visible</Tag>
+            ) : (
+              <Tag color="error">Oculta</Tag>
+            ),
             actions: (
-              <ActionButtons path={`/lecciones/${levelKey}/${lessonKey}`} />
+              <ActionButtons
+                path={`/lecciones/${levelKey}/${lessonKey}`}
+                isVisible={response[levelKey][lessonKey].isVisible}
+                refresher={setRefreshCount}
+              />
             ),
           }));
           mappedLessons.push(...lessons);
@@ -86,7 +138,7 @@ function Lessons() {
 
   useEffect(() => {
     fetchLessons();
-  }, []);
+  }, [refreshCount]);
 
   const items = [
     {

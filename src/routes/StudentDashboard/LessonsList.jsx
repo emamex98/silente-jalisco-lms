@@ -48,7 +48,16 @@ function LessonList({ returnToMain, mode }) {
       <div className="lesson-list-grid">
         {lessonKeys.length > 0 &&
           lessonKeys.map((lessonKey) => {
-            const { styledName: name, styledLevel: level } = lessons[lessonKey];
+            const {
+              styledName: name,
+              styledLevel: level,
+              isVisible,
+            } = lessons[lessonKey];
+
+            if (!isVisible) {
+              return null;
+            }
+
             return (
               <Card
                 hoverable

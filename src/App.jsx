@@ -54,14 +54,16 @@ function App() {
 
   useEffect(() => {
     const fetchUserData = async (userCredential) => {
-      const { displayName, role, level, active } =
-        await getUserData(userCredential);
-      setUserData({
-        name: displayName ?? 'usuario',
-        role: role ?? 'student',
-        level: level ?? 'A1',
-        active: active ?? true,
-      });
+      if (userCredential) {
+        const { displayName, role, level, active } =
+          await getUserData(userCredential);
+        setUserData({
+          name: displayName ?? 'usuario',
+          role: role ?? 'student',
+          level: level ?? 'A1',
+          active: active ?? true,
+        });
+      }
     };
 
     fetchUserData(currentUser);
