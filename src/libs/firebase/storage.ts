@@ -4,6 +4,7 @@ import {
   uploadBytes,
   listAll,
   getDownloadURL,
+  deleteObject,
 } from 'firebase/storage';
 import { firebase } from './config';
 
@@ -44,6 +45,19 @@ export const getFileUrl = async (path: string) => {
   try {
     const url = await getDownloadURL(filesRef);
     return url;
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
+};
+
+export const deleteFolder = async (path: string) => {
+  const listRef = ref(storage, `${environment}${path}`);
+  try {
+    const files = await listAll(listRef);
+    for (const file of files?.items) {
+      await deleteObject(file);
+    }
   } catch (e) {
     console.error(e);
     throw e;

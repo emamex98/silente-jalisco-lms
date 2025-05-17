@@ -172,6 +172,7 @@ function NewLesson() {
         styledName: lessonDetails.name,
         styledLevel: lessonDetails.level.toUpperCase(),
         content: vocabularyObject,
+        isVisible: true,
       });
       setShowModal(true);
     } catch (e) {
