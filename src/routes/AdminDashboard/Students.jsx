@@ -1,41 +1,10 @@
 import { Button, Table, Flex, Tag } from 'antd';
-import { get } from '@libs/firebase/database';
 import { useEffect, useState } from 'react';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import EditStudentModal from '@components/Modal/EditStudentModal';
+import { getFormattedStudents } from '../../services/studentsService'; // Import service
+import ActionButtons from '@components/ActionButtons/ActionButtons';
 import { USER_ACTIONS, LEVELS } from '@utils/constants';
-
-function ActionButtons({
-  userId,
-  setCurrentData,
-  setUserAction,
-  setOpenModal,
-}) {
-  return (
-    <Flex gap={10}>
-      <Button
-        icon={<EditOutlined />}
-        onClick={() => {
-          setCurrentData(userId);
-          setUserAction(USER_ACTIONS.EDIT);
-          setOpenModal(true);
-        }}
-      >
-        Editar
-      </Button>
-      <Button
-        icon={<DeleteOutlined />}
-        onClick={() => {
-          setCurrentData(userId);
-          setUserAction(USER_ACTIONS.DELETE);
-          setOpenModal(true);
-        }}
-      >
-        Eliminar
-      </Button>
-    </Flex>
-  );
-}
 
 function Students() {
   const [data, setData] = useState([]);
@@ -78,53 +47,65 @@ function Students() {
     },
   ];
 
-  const fetchStudents = async () => {
+  const loadStudents = async () => { // Renamed from fetchStudents
     setIsLoading(true);
     try {
-      const response = await get('user_data/');
+      const studentsData = await getFormattedStudents(); // Call service
 
-      if (response) {
-        const mappedStudents = [];
-        Object.keys(response).forEach((userId) => {
-          const user = response[userId];
-          if (user.role === 'student') {
-            mappedStudents.push({
-              id: userId,
-              key: userId,
-              actions: (
-                <ActionButtons
-                  userId={userId}
-                  setCurrentData={setCurrentData}
-                  setUserAction={setUserAction}
-                  setOpenModal={setOpenModal}
-                />
-              ),
-              ...user,
-              level: user.level.toUpperCase(),
-              status: user.active ? (
-                <Tag color="success">Activo</Tag>
-              ) : (
-                <Tag color="error">Inactivo</Tag>
-              ),
-            });
-          }
-        });
+      if (studentsData) {
+        const mappedStudents = studentsData.map((student) => ({
+          ...student, // Spread student data from service
+          key: student.id, // Use student.id for key
+          actions: (() => {
+            const actionItems = [
+              {
+                key: 'edit',
+                icon: <EditOutlined />,
+                text: 'Editar',
+                onClick: () => {
+                  setCurrentData(student.id); // Use student.id
+                  setUserAction(USER_ACTIONS.EDIT);
+                  setOpenModal(true);
+                },
+              },
+              {
+                key: 'delete',
+                icon: <DeleteOutlined />,
+                text: 'Eliminar',
+                onClick: () => {
+                  setCurrentData(student.id); // Use student.id
+                  setUserAction(USER_ACTIONS.DELETE);
+                  setOpenModal(true);
+                },
+                danger: true,
+              },
+            ];
+            return <ActionButtons items={actionItems} />;
+          })(),
+          level: student.level ? student.level.toUpperCase() : 'N/A', // Handle undefined level
+          status: student.active ? (
+            <Tag color="success">Activo</Tag>
+          ) : (
+            <Tag color="error">Inactivo</Tag>
+          ),
+        }));
         setData(mappedStudents);
       }
     } catch (e) {
-      console.error(e);
+      console.error('Error loading students for display:', e);
+      setData([]); // Clear data on error
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStudents();
-  }, []);
+    loadStudents();
+  }, []); // Initial load
 
   useEffect(() => {
     if (sucessCount > 0) {
-      fetchStudents();
+      loadStudents(); // Refresh data when successCount changes
     }
   }, [sucessCount]);
 

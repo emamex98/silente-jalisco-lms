@@ -1,72 +1,20 @@
 import { Button, Table, Flex, Dropdown, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { get, post, remove } from '@libs/firebase/database';
-import { deleteFolder } from '@libs/firebase/storage';
 import { useEffect, useState } from 'react';
 import {
   ExportOutlined,
-  EditOutlined,
+  // EditOutlined, // Not used, can be removed if not planned for future
   DeleteOutlined,
   PlusOutlined,
   EyeOutlined,
   EyeInvisibleOutlined,
 } from '@ant-design/icons';
-
-function ActionButtons({ path, isVisible, refresher }) {
-  const navigate = useNavigate();
-
-  const deleteLesson = async (path) => {
-    try {
-      await remove(path.replace('/lecciones/', '/lessons/'));
-      await deleteFolder(path.replace('/lecciones', ''));
-      refresher((i) => i + 1);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const toggleLessonVisbility = async (path) => {
-    try {
-      const lessonVisibilityPath = `${path.replace('/lecciones/', '/lessons/')}/isVisible`;
-      const resp = await post(lessonVisibilityPath, !isVisible);
-      refresher((i) => i + 1);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  return (
-    <Flex gap={10}>
-      <Button
-        icon={<ExportOutlined />}
-        onClick={() => {
-          navigate(path);
-        }}
-      >
-        Abrir
-      </Button>
-      {/* <Button icon={<EditOutlined />} disabled>
-        Editar
-      </Button> */}
-      <Button
-        icon={isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-        onClick={() => {
-          toggleLessonVisbility(path);
-        }}
-      >
-        {isVisible ? 'Ocultar' : 'Mostrar'}
-      </Button>
-      <Button
-        icon={<DeleteOutlined />}
-        onClick={() => {
-          deleteLesson(path);
-        }}
-      >
-        Borrar
-      </Button>
-    </Flex>
-  );
-}
+import ActionButtons from '@components/ActionButtons/ActionButtons';
+import {
+  getFormattedLessons,
+  deleteLesson as deleteLessonService,
+  toggleLessonVisibility as toggleLessonVisibilityService,
+} from '../../services/lessonsService'; // Adjusted path
 
 function Lessons() {
   const navigate = useNavigate();
@@ -88,8 +36,8 @@ function Lessons() {
     },
     {
       title: 'Visibilidad',
-      dataIndex: 'isVisible',
-      key: 'isVisible',
+      dataIndex: 'isVisibleTag', // Changed from isVisible to avoid conflict if isVisible boolean is needed
+      key: 'isVisibleTag',
     },
     {
       title: 'Acciones',
@@ -98,47 +46,72 @@ function Lessons() {
     },
   ];
 
-  const fetchLessons = async () => {
+  const loadLessons = async () => {
     setIsLoading(true);
     try {
-      const response = await get('lessons/');
-
-      if (response) {
-        const mappedLessons = [];
-        Object.keys(response).forEach((levelKey) => {
-          const level = response[levelKey];
-          const lessons = Object.keys(level).map((lessonKey) => ({
-            name: response[levelKey][lessonKey].styledName,
-            level: response[levelKey][lessonKey].styledLevel,
-            key: `${levelKey}-${lessonKey}`,
-            isVisible: response[levelKey][lessonKey].isVisible ? (
-              <Tag color="success">Visible</Tag>
-            ) : (
-              <Tag color="error">Oculta</Tag>
-            ),
-            actions: (
-              <ActionButtons
-                path={`/lecciones/${levelKey}/${lessonKey}`}
-                isVisible={response[levelKey][lessonKey].isVisible}
-                refresher={setRefreshCount}
-              />
-            ),
-          }));
-          mappedLessons.push(...lessons);
-        });
-
-        setData(mappedLessons);
-      }
+      const lessonsData = await getFormattedLessons();
+      const processedData = lessonsData.map((lesson) => ({
+        ...lesson,
+        isVisibleTag: lesson.isVisible ? (
+          <Tag color="success">Visible</Tag>
+        ) : (
+          <Tag color="error">Oculta</Tag>
+        ),
+        actions: (() => {
+          const actionItems = [
+            {
+              key: 'open',
+              icon: <ExportOutlined />,
+              text: 'Abrir',
+              onClick: () => navigate(lesson.path),
+            },
+            {
+              key: 'toggleVisibility',
+              icon: lesson.isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />,
+              text: lesson.isVisible ? 'Ocultar' : 'Mostrar',
+              onClick: async () => {
+                try {
+                  await toggleLessonVisibilityService(lesson.path, lesson.isVisible);
+                  setRefreshCount((c) => c + 1);
+                } catch (error) {
+                  console.error('Failed to toggle visibility:', error);
+                  // Optionally, show an error message to the user
+                }
+              },
+            },
+            {
+              key: 'delete',
+              icon: <DeleteOutlined />,
+              text: 'Borrar',
+              onClick: async () => {
+                try {
+                  // Consider adding a confirmation dialog here
+                  await deleteLessonService(lesson.path);
+                  setRefreshCount((c) => c + 1);
+                } catch (error) {
+                  console.error('Failed to delete lesson:', error);
+                  // Optionally, show an error message to the user
+                }
+              },
+              danger: true,
+            },
+          ];
+          return <ActionButtons items={actionItems} />;
+        })(),
+      }));
+      setData(processedData);
     } catch (e) {
-      console.error(e);
+      console.error('Error loading lessons for display:', e);
+      // Optionally, set an error state to display a message to the user
+      setData([]); // Clear data or set to an empty state on error
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchLessons();
-  }, [refreshCount]);
+    loadLessons();
+  }, [refreshCount, navigate]); // Added navigate to dependencies as it's used in actions
 
   const items = [
     {
