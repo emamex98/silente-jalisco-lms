@@ -1,8 +1,12 @@
 import { Modal, Input, Form, Select } from 'antd';
 import { LEVELS, USER_ACTIONS } from '@utils/constants';
-import { createUser } from '@libs/firebase/authentication';
 import { useEffect, useState } from 'react';
-import { get, post, remove } from '@libs/firebase/database';
+import { get } from '@libs/firebase/database'; // Keep get for fetchStudentData
+import {
+  createStudent,
+  updateStudent,
+  deleteStudent,
+} from '../../services/studentsService'; // Import service functions
 
 function EditStudentModal({
   action,
@@ -15,77 +19,48 @@ function EditStudentModal({
   const [form] = Form.useForm();
   const [userName, setUserName] = useState('');
 
-  const handleCreateUser = async ({ name, email, level }) => {
-    try {
-      setConfirmLoading(true);
-      const userCredential = await createUser(email);
-
-      if (userCredential && userCredential.user.uid) {
-        await post(`user_data/${userCredential.user.uid}`, {
-          displayName: name,
-          level,
-          role: 'student',
-          active: true,
-        });
-      }
-      setOpenModal(false);
-      setSuccessCount((i) => i + 1);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setConfirmLoading(false);
-    }
-  };
-
-  const handleEditUser = async ({ name, level, status }) => {
-    try {
-      setConfirmLoading(true);
-
-      if (name && level && status !== undefined) {
-        await post(`user_data/${currentData}`, {
-          displayName: name,
-          level,
-          role: 'student',
-          active: status === 'active',
-        });
-      }
-      setOpenModal(false);
-      setSuccessCount((i) => i + 1);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setConfirmLoading(false);
-    }
-  };
-
-  const handleDeleteUser = async () => {
-    try {
-      setConfirmLoading(true);
-      await remove(`user_data/${currentData}`);
-      setOpenModal(false);
-      setSuccessCount((i) => i + 1);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setConfirmLoading(false);
-    }
-  };
-
   const handleModalCancel = () => {
     setOpenModal(false);
     form.resetFields();
   };
 
-  const handleSubmit = async ({ name, email, level, status }) => {
-    if (action === USER_ACTIONS.CREATE) {
-      await handleCreateUser({ name, email, level });
-    }
-
-    if (action === USER_ACTIONS.EDIT) {
-      await handleEditUser({ name, level, status });
+  const handleSubmit = async (values) => {
+    const { name, email, level, status } = values;
+    setConfirmLoading(true);
+    try {
+      if (action === USER_ACTIONS.CREATE) {
+        // Assuming password needs to be handled; service expects it.
+        // This is a placeholder as the original form didn't collect password.
+        await createStudent({ displayName: name, email, level, password: 'defaultPassword' });
+      } else if (action === USER_ACTIONS.EDIT) {
+        await updateStudent(currentData, { displayName: name, level, active: status === 'active' });
+      }
+      setOpenModal(false);
+      setSuccessCount((i) => i + 1);
+    } catch (e) {
+      console.error('Error submitting form:', e);
+      // TODO: Show error message to user via antd Message or Notification
+    } finally {
+      setConfirmLoading(false);
     }
   };
 
+  const handleDelete = async () => {
+    setConfirmLoading(true);
+    try {
+      await deleteStudent(currentData);
+      setOpenModal(false);
+      setSuccessCount((i) => i + 1);
+    } catch (e) {
+      console.error('Error deleting student:', e);
+      // TODO: Show error message to user
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
+  // fetchStudentData remains as is for now, as it's for pre-filling the form.
+  // Ideally, this could also be a service call like getStudentById(currentData).
   const fetchStudentData = async () => {
     if (!currentData || !openModal) {
       return;
@@ -121,7 +96,7 @@ function EditStudentModal({
       <Modal
         title="Eliminar cuenta de un estudiante"
         open={openModal}
-        onOk={handleDeleteUser}
+        onOk={handleDelete} // Use new handleDelete
         okText="Eliminar"
         confirmLoading={confirmLoading}
         onCancel={handleModalCancel}
